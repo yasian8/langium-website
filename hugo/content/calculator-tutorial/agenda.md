@@ -4,7 +4,7 @@ weight: 100
 ---
 
 You will learn how to
-* setup a Langium project
+* [setup a Langium project](/calculator-tutorial/0-setup)
 * add comments (structuring the document)
 * add syntax highlighting
 * add values and errors (type system)
