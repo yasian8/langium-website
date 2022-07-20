@@ -6,5 +6,5 @@ weight: 10000
 We want to write an error calculator.
 
 * [Mission](./mission)
-* [Learning goals](./goals)
+* [Goals and agenda](./agenda)
 
