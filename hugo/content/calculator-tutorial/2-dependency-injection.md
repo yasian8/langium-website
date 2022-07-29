@@ -5,7 +5,7 @@ weight: 500
 
 ## Prerequisites
 
-Finish the [Adding a test framework](/calculator-tutorial/1-test-framework).
+Finish the ['Adding a test framework'](/calculator-tutorial/1-test-framework) lesson or start from [here](TODO link to a repo path or branch).
 
 ## Goal
 

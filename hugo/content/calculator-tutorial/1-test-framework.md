@@ -5,7 +5,7 @@ weight: 400
 
 ## Prerequisites
 
-Finish the [Langium setup](/calculator-tutorial/0-setup) or start from [here](TODO link to a repo path or branch).
+Finish the ['Langium setup'](/calculator-tutorial/0-setup) lesson or start from [here](TODO link to a repo path or branch).
 
 ## Reminder
 
