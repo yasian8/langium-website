@@ -1,5 +1,5 @@
 ---
-title: "Setup Langium"
+title: "Setting up Langium"
 weight: 300
 ---
 
