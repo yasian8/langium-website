@@ -3,6 +3,14 @@ title: "Setting up Langium"
 weight: 300
 ---
 
+## Prerequisites
+
+None.
+
+## Goal
+
+Make your environment ready for Langium.
+
 ## Start with Yeoman
 
 * [ ] Open VSCode in your prefered working directory, I will call it `<cwd>` from now on.
@@ -32,8 +40,8 @@ weight: 300
   ```
 
 ## Know your scripts
-* [ ] go to your terminal in the `<cwd>` and execute `npm run langium:generate`, each time you have changed the grammar file or `npm run langium:watch` if the computer shall watch and compile on a change automatically. The last lines should contain `Langium generator finished successfully`.
-* [ ] go to your terminal in `<cwd>` and execute `npm run build`, each time you have changed a source file. This is done automatically when running `npm run watch` instead.
+* [ ] go to your terminal in the `<cwd>` and execute `npm run langium:generate`, each time you have changed the grammar file or `npm run langium:watch` if the computer shall watch and compile on a change automatically. The last lines should contain `Langium generator finished successfully`. These commands generate the abstract syntax tree (AST) types and everything needed to populate an instance of a AST from an input string.
+* [ ] additionally, execute `npm run build`, each time you have changed a source file. This is done automatically when running `npm run watch` instead. With these commands, all TypeScript files will be transpiled to Javascript, so that it is usable for the VSCode extension. That's it.
 
 ## Know your grammar
 * [ ] open the grammar file at `src/language-server/error-math.langium`
@@ -56,6 +64,26 @@ weight: 300
 
     hidden terminal ML_COMMENT: /\/\*[\s\S]*?\*\//;  // hidden multi and single line comments
     hidden terminal SL_COMMENT: /\/\/[^\n\r]*/;
+    ```
+
+## Know your AST
+
+* [ ] After `langium:generate` was executed, you can take a look into the `generated/ast.ts` file.
+    It will contain following types. They are listed in a simplified manner, because you should just get the idea, what is going on. 
+
+    ```typescript
+    export interface Person {
+        name: string
+    }
+
+    export interface Greeting {
+        person: Reference<Person>
+    }
+
+    export interface Model {
+        greetings: Array<Greeting>
+        persons: Array<Person>
+    }
     ```
 
 ## Run your language editor
