@@ -54,8 +54,8 @@ Be aware of that this is a value definition this time!
 
 ## How to use a module?
 
-Every language created with Langium has an entrypoint where its module is defined.
-All you have to do is to call the `create[...]Services` method from the `[...]-module.ts` file from the `language-server` folder.
+Every language created with Langium has a module as an entrypoint.
+All you have to do is to call the `createLANGUAGE_NAMEServices` method from the `LANGUAGE_NAME-module.ts` file from the `language-server` folder.
 
 ```typescript
 // importing from within a test file
@@ -69,32 +69,22 @@ If you want to access a service you just take the `services` object and call the
 Let's write the following test:
 
 ```typescript
-describe
+import {createErrorMathServices} from '../src/language-server/error-math-module'
+import { Model } from '../src/language-server/generated/ast';
+import 'jest-expect-message';
 
-
-const astNode = services.ErrorMath.parser.LangiumParser.parse<Model>('person Mario\nHello Mario!').value;
-console.log(astNode.persons)
-//[
-//    {
-//      '$type': 'Person',
-//      'name': 'Mario',
-//      '$cstNode': ...,
-//      '$....': ...
-//    }
-//]
-console.log(astNode.greetings)
-//[
-//    {
-//        '$type': 'Greeting',
-//        'person': {
-//            '$refNode': [LeafCstNodeImpl],
-//            '$refText': 'Mario',
-//            ref: ..., //circular reference to the person
-//            '$nodeDescription': ...,
-//            error: ...
-//        },
-//        '$cstNode': ...,
-//        '$....': ...
-//    }
-//]
+describe('Parsing tests', () => {
+    it('should parse only', () => {
+        // arrange + act
+        const result = services.ErrorMath.parser.LangiumParser.parse<Model>('person Mario\nHello Mario!');
+        expect(result.lexerErrors).toHaveLength(0);
+        expect(result.parserErrors).toHaveLength(0);
+        // assert
+        const model = result.value;
+        expect(model.persons).toHaveLength(1);
+        expect(model.greetings).toHaveLength(1);
+        expect(model.persons[0].name).toBe('Mario');
+        expect(model.greetings[0].person.ref).toBeUndefined();
+    });
+});
 ```
