@@ -73,6 +73,8 @@ import {createErrorMathServices} from '../src/language-server/error-math-module'
 import { Model } from '../src/language-server/generated/ast';
 import 'jest-expect-message';
 
+const services = createErrorMathServices();
+
 describe('Parsing tests', () => {
     it('should parse only', () => {
         // arrange + act
@@ -87,4 +89,22 @@ describe('Parsing tests', () => {
         expect(model.greetings[0].person.ref).toBeUndefined();
     });
 });
+```
+
+Keep in mind that all services are accessible through an instance of `createErrorMathServices()`.
+
+## Default services
+
+The last thing you need to know are the default implementations of the services. Creating a language in Langium is driven by a lot of default implemented services. The default and custom implementation is wired together in the `createErrorMathServices()` function.
+
+If you need a custom implementation of `LangiumParser`, you just need to override the factory method inside of your language module. Lesson by lesson, you will understand more and more services of Langium.
+
+```typescript
+export const ErrorMathModule: Module<ErrorMathServices, PartialLangiumServices & ErrorMathAddedServices> = {
+    //... validation: {...},
+    //override known section
+    parser: {
+        LangiumParser: (services) => new MyMagicalParser(services),
+    }
+};
 ```
