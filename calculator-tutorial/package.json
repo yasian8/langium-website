@@ -8,7 +8,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "test": "echo 'nothing'"
+    "test": "rimraf test && mkdir test && node build/cli.js init -o test"
   },
   "dependencies": {
     "@types/terminal-kit": "^1.34.1",

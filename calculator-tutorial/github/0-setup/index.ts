@@ -30,10 +30,27 @@ export class SetupStage implements Stage {
         if(!('generator-langium' in list.dependencies)) {
             await runCommand('Installing Yeoman and Langium', "npm i -g generator-langium");
         }
-        await runCommand('Run Yeoman with Langium generator', "yo langium");
+        await runCommand('Run Yeoman with Langium generator', "yo langium", {promptAnswers: [
+            'ErrorMathTutorial',
+            'Error Math',
+            '.errmath'
+        ], ignoreStdErr: true});
+        await runCommand('Move files to <cwd>>', 'mv ErrorMathTutorial/* .');
+        await runCommand('Install node modules', 'npm install');
         return true;
     }
     async after(report: Reporter): Promise<boolean> {
+        try {
+            await runCommand('Generate files from Langium grammar', 'npm run langium:generate');
+            await runCommand('Generate Javascript sources', 'npm run build');
+        } catch(err: unknown) {
+            if(err instanceof Error) {
+                report('err', err.message);
+            } else if(typeof err === 'string') {
+                report('err', err);
+            }
+        }
+        
         return Promise.resolve(true);
     }
 }

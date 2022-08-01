@@ -47,19 +47,21 @@ Cmd
         const stage = Stages[stageIndex];
 
         term.magenta(`< ${stageIndex+1}. stage: ${stage.id}\n`)
-        term.magenta(`  - checking preconditions... \n`)
+        term.green(`> Checking preconditions... \n`)
         await stage.before(report);
 
-        term.magenta(`  - initializing stage... \n`)
+        term.green(`> Initializing stage... \n`)
         await stage.initialize();
-        term.magenta('\n')
 
-        term.magenta(`  - checking postconditions... \n`)
+        term.green(`> Checking postconditions... \n`)
         await stage.after(report);
-        term.magenta('\n')
-
-        term.magenta('\n')
+        term.green('\n')
     }
     term.green();
     process.exit(0);
   }).help().argv
+
+
+process.on('SIGINT', () => {process.exit()})
+process.on('SIGQUIT', () => {process.exit()});
+process.on('SIGTERM', () => {process.exit()}); 
