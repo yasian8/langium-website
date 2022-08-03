@@ -1,11 +1,13 @@
 import {exec} from 'child_process'
 
 import TerminalKit from 'terminal-kit';
+import rimraf from 'rimraf';
 
 export type Reporter = (level: 'warn'|'err', message: string) => void; 
 
 export interface Stage {
     readonly id: string;
+    readonly dirname: string;
     before(report: Reporter): Promise<boolean>;
     initialize(): Promise<boolean>;
     after(report: Reporter): Promise<boolean>;
@@ -38,7 +40,6 @@ export async function runCommand(title: string, command: string, options?: RunCo
                 term.red('failed stderr\n'+stderr+'\n');
                 return reject(stderr);
             }
-            term.green('done\n');
             resolve(stdout);
         });
         let lastOutput: Date|null = new Date();
@@ -72,3 +73,11 @@ export function choose(items: string[]): Promise<number> {
     });
 }
 
+export function removeFolder(path: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        rimraf('./node_modules', (err) => {
+            if(err) return reject(err);
+            resolve();
+        });
+    });
+}

@@ -1,6 +1,8 @@
 import Cmd from 'yargs';
-import { term, choose, Reporter } from './types';
+import { term, choose, Reporter, removeFolder } from './types';
 import { Stages } from './stages';
+import { zip } from 'zip-a-folder';
+import { resolve, relative } from 'path';
 
 Cmd
   .scriptName("tutorial")
@@ -9,12 +11,12 @@ Cmd
       type: 'string',
       describe: 'name of the stage'
     });
-    yargs.option('o', {
-        alias: 'out',
-        demandOption: true,
-        default: '.',
-        describe: 'Output directory',
-        type: 'string'
+
+    yargs.option('z', {
+        alias: 'zip',
+        demandOption: false,
+        describe: 'Save a zip for each step',
+        type: 'boolean'
     });
 
     yargs.option('o', {
@@ -25,6 +27,8 @@ Cmd
         type: 'string'
     });
   }, async function (argv) {
+    const writeZip = argv.zip === true;
+
     process.chdir(argv.out as string);
 
     let maxStageIndex = Stages.findIndex(s=> s.id === argv.stage);
@@ -47,15 +51,27 @@ Cmd
         const stage = Stages[stageIndex];
 
         term.magenta(`< ${stageIndex+1}. stage: ${stage.id}\n`)
-        term.green(`> Checking preconditions... \n`)
+        term.blue(`! Checking preconditions... \n`)
         await stage.before(report);
 
-        term.green(`> Initializing stage... \n`)
+        term.blue(`! Initializing stage... \n`)
         await stage.initialize();
 
-        term.green(`> Checking postconditions... \n`)
+        term.blue(`! Checking postconditions... \n`)
         await stage.after(report);
-        term.green('\n')
+
+        if(writeZip) {
+          term.blue(`! Zipping a starter... \n`);
+          term.green(`> Removing node_modules, out, bin... \n`);
+          await removeFolder('./node_modules');
+          console.log(await removeFolder('./out'));
+          console.log(await removeFolder('./bin'));
+
+          term.green(`> Creating the archive... \n`)
+          const from = resolve('.');
+          const to = resolve('..', relative(__dirname, stage.dirname), 'start.zip');
+          await zip(from, to)
+        }
     }
     term.green();
     process.exit(0);

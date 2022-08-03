@@ -1,4 +1,4 @@
-import { Reporter, runCommand, Stage, term } from "../../types";
+import { removeFolder, Reporter, runCommand, Stage, term } from "../../types";
 import { readdir } from 'fs/promises'
 
 export interface PackageVersion {
@@ -13,6 +13,7 @@ export interface PackageList {
 
 export class SetupStage implements Stage {
     id = 'setup Langium'
+    dirname = __dirname
     async before(report: Reporter): Promise<boolean> {
         let result = true;
         const list = await readdir('.');
@@ -35,7 +36,8 @@ export class SetupStage implements Stage {
             'Error Math',
             '.errmath'
         ], ignoreStdErr: true});
-        await runCommand('Move files to <cwd>>', 'mv ErrorMathTutorial/* .');
+        await runCommand('Move files to <cwd>', 'mv ErrorMathTutorial/{*,.[^.]*} .');
+        await removeFolder('./ErrorMathTutorial');
         await runCommand('Install node modules', 'npm install');
         return true;
     }

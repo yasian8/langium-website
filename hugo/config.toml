@@ -1,6 +1,7 @@
 baseURL = "/"
 title = "Langium"
 theme = "hugo-geekdoc"
+ignoreFiles = ['.*/node_modules/.*']
 
 # Required to get well formatted code blocks
 pygmentsUseClasses = true
@@ -72,5 +73,3 @@ enableRobotsTXT = true
   # 'date', 'publishdate', 'expirydate' or 'lastmod'. Every option can be used with a reverse modifier as well
   # e.g. 'title_reverse'.
   #geekdocFileTreeSortBy = "title"
-
-  ignoreFiles = ['/node_modules/.*']
