@@ -1,5 +1,5 @@
 import {exec} from 'child_process'
-
+import fs from 'fs/promises';
 import TerminalKit from 'terminal-kit';
 import rimraf from 'rimraf';
 
@@ -22,6 +22,11 @@ export async function write(stream: any, input: string): Promise<void> {
 export interface RunCommandOptions {
     promptAnswers?: string[];
     ignoreStdErr?: boolean;
+}
+
+export async function runScript(title: string, commandPath: string, options?: RunCommandOptions): Promise<string> {
+    const command = await fs.readFile(commandPath, 'utf-8');
+    return runCommand(title, command, options);
 }
 
 export async function runCommand(title: string, command: string, options?: RunCommandOptions): Promise<string> {
@@ -75,7 +80,7 @@ export function choose(items: string[]): Promise<number> {
 
 export function removeFolder(path: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-        rimraf('./node_modules', (err) => {
+        rimraf(path, (err) => {
             if(err) return reject(err);
             resolve();
         });

@@ -1,4 +1,4 @@
-import { removeFolder, Reporter, runCommand, Stage, term } from "../../types";
+import { removeFolder, Reporter, runCommand, runScript, Stage, term } from "../../../types";
 import { readdir } from 'fs/promises'
 
 export interface PackageVersion {
@@ -26,17 +26,17 @@ export class SetupStage implements Stage {
     async initialize(): Promise<boolean> {
         const list = JSON.parse(await runCommand('Checking if Yeoman and Langium are installed', 'npm list -g --json')) as PackageList; 
         if(!('yo' in list.dependencies)) {
-            await runCommand('Installing Yeoman and Langium', "npm i -g yo");
+            await runScript('Installing Yeoman', "steps/00-install-yo.sh");
         }
         if(!('generator-langium' in list.dependencies)) {
-            await runCommand('Installing Yeoman and Langium', "npm i -g generator-langium");
+            await runScript('Installing Langium', "steps/01-install-langium.sh");
         }
-        await runCommand('Run Yeoman with Langium generator', "yo langium", {promptAnswers: [
+        await runScript('Run Yeoman with Langium generator', "steps/02-run-langium-cli.sh", {promptAnswers: [
             'ErrorMathTutorial',
             'Error Math',
             '.errmath'
         ], ignoreStdErr: true});
-        await runCommand('Move files to <cwd>', 'mv ErrorMathTutorial/{*,.[^.]*} .');
+        await runCommand('Move files to <cwd>', 'steps/03-move-to-root-folder.sh');
         await removeFolder('./ErrorMathTutorial');
         await runCommand('Install node modules', 'npm install');
         return true;

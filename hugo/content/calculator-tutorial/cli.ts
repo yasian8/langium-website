@@ -64,8 +64,8 @@ Cmd
           term.blue(`! Zipping a starter... \n`);
           term.green(`> Removing node_modules, out, bin... \n`);
           await removeFolder('./node_modules');
-          console.log(await removeFolder('./out'));
-          console.log(await removeFolder('./bin'));
+          await removeFolder('./out');
+          await removeFolder('./bin');
 
           term.green(`> Creating the archive... \n`)
           const from = resolve('.');

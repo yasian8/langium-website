@@ -1,7 +1,8 @@
 baseURL = "/"
 title = "Langium"
 theme = "hugo-geekdoc"
-ignoreFiles = ['.*/node_modules/.*']
+ignoreFiles = ['.*/node_modules/.*', '.*/calculator-tutorial/test/.*', '.*/calculator-tutorial/build/.*']
+enableInlineShortcodes = true
 
 # Required to get well formatted code blocks
 pygmentsUseClasses = true
