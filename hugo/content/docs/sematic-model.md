@@ -207,7 +207,7 @@ Primary infers Expression:
     '(' Expression ')' | {Literal} value=NUMBER;
 ```
 
-When parsing a document containing `def x: (1 + 2) + 3`, this is the shape of the semantic model node:
+وقتی تجزیه یک سند به شکل `def x: (1 + 2) + 3` باشد، شکل گره مدل معنایی آن به صورت زیر می باشد:
 
 {{<mermaid>}}
 graph TD;
@@ -221,9 +221,8 @@ left_right --> left_right_{2}
 right_left --> right_left_v{3}
 {{</mermaid>}}
 
-We can see that the nested `right -> left` nodes in the tree are unnecessary and we would like to remove one level of nesting from the tree. 
-
-This can be done by refactoring the grammar and adding an assigned action:
+می‌توانیم ببینیم که گره‌های تودرتو `right -> left` در درخت غیر ضروری هستند و می‌خواهیم یک سطح تودرتو از درخت را حذف کنیم.
+این کار را می توان با تغییر شکل دستور زبان و اضافه کردن یک عمل اختصاص داده شده انجام داد:
 
 ```langium
 Definition: 
@@ -237,7 +236,7 @@ Primary infers Expression:
     '(' Expression ')' | {Literal} value=NUMBER;
 ```
 
-Parsing the same document now leads to this semantic model:
+اکنون تجزیه همان سند به این مدل معنایی تبدیل می شود:
 
 {{<mermaid>}}
 graph TD;
@@ -250,20 +249,16 @@ left_left --> left_left_v{1}
 left_right --> left_right_{2}
 {{</mermaid>}}
 
-While this is a fairly trivial example, adding more layers of expression types in your grammar massively degrades the quality of your syntax tree as each layer will add another empty `right` property to the tree. Assigned actions alleviate this issue completely.
+با اینکه این یک مثال نسبتاً پیش پا افتاده است، اضافه کردن لایه‌های بیشتری از انواع عبارت در گرامر، کیفیت درخت نحو شما را به شدت کاهش می‌دهد، زیرا هر لایه ویژگی خالی `right` دیگری را به درخت اضافه می‌کند. اقدامات تعیین شده این موضوع را به طور کامل برطرف می کند.
 
-## Declared Types
-It's important to keep in mind that while declared types can improve your grammars, they are a *bleeding edge feature and are still being developed*.
-
-Because type inference takes into account every entity of a parser rule, even the smallest changes can update your inferred types. This can lead to unwanted changes in your semantic model and incorrect behavior of services that depend on it. To minimize the risk of introducing breaking changes when modifying the grammar, we have introduced *declared types* as a new feature.
-
-In most cases, especially for early language designs, letting the type inference take care of generating your types will be your best choice. As your language starts to mature, it may then be of interest to fix parts of your semantic model using declared types.
-
-With that aside, declared types can be *especially* helpful for more mature and complex languages, where a stable semantic model is key and breaking changes introduced by inferred types can break your language services. Declared types allow the user to **fix** the type of their parser rules and rely on the power of validation errors to detect breaking changes.
+## انواع اعلام شده(Declared Types)
+این مهم است که به خاطر داشته باشید که با اینکه که انواع اعلام شده می توانند گرامرهای شما را بهبود بخشند، آنها یک ویژگی *bleeding edge هستند و هنوز در حال توسعه می باشند*.
+از آنجا که استنتاج نوع هر موجودیت یک قانون را در نظر می گیرد، حتی کوچکترین تغییرات می تواند انواع استنتاج شده شما را به روز کند. این می تواند منجر به تغییرات ناخواسته در مدل معنایی شما و رفتار نادرست خدمات وابسته به آن شود. برای کاهش احتمال تغییرات ناسازگار هنگام اصلاح دستور زبان، *انواع اعلام شده* را به عنوان یک ویژگی جدید معرفی کرده ایم.
+در بیشتر موارد، به‌ویژه برای طراحی‌های اولیه زبان، استفاده از استنتاج نوع برای تولید انواع بهترین انتخاب خواهد بود. همانطور که زبان شما شروع به رشد می کند، بهتر است که بخش هایی از مدل معنایی خود را با استفاده از انواع اعلام شده اصلاح کنید.
+با این وجود، انواع اعلام شده می تواند *به خصوص* برای زبان های بالغ تر و پیچیده تر مفید باشد، جایی که یک مدل معنایی پایدار کلیدی است و تغییرات ناسازگار ایجاد شده توسط انواع استنباط شده می تواند خدمات زبان شما را خراب کند. انواع اعلام شده به کاربر این امکان را می دهد که نوع قوانین تجزیه کننده خود را **درست کند** و برای شناسایی تغییرات ناسازگار بر قدرت خطاهای اعتبارسنجی تکیه کند.
 
 
-
-Let's look at the example from the previous section:
+بیایید به مثال بخش قبلی بپردازیم:
 
 ```langium
 X infers MyType: name=ID;
@@ -279,17 +274,18 @@ X returns MyType: name=ID;
 Y returns MyType: name=ID count=INT;
 ```
 
-We now explicitly declare `MyType` directly in the grammar with the keyword `interface`. The parser rules `X` and `Y` creating nodes of type `MyType` need to explicitly declare the type of the node they create with the keyword `returns`.
+اکنون به صراحت `MyType` را مستقیماً در گرامر با کلمه کلیدی `interface` اعلام می کنیم. قوانین تجزیه کننده `X` و `Y` که گره‌هایی از نوع `MyType` ایجاد می‌کنند، باید به صراحت نوع گره‌ای را که ایجاد می‌کنند با کلمه کلیدی `returns` اعلام کنند.
 
-Contrary to [inferred types](#inferred-types), all properties must be explicitly declared in order to be valid inside of a parser rule. The following syntax:
+بر خلاف [inferred types](#inferred-types), همه ویژگی ها باید به ترتیب اعلام شوند تا درون یک قانون تجزیه معتبر باشند. دستور زیر:
 
 ```langium
 Z returns MyType: name=ID age=INT;
 ```
 
-will show the following validation error `A property 'age' is not expected` because the declaration of `MyType` does not include the property `age`. In short, *declared types* add a layer of safety via validation to the grammar that prevents mismatches between the expected semantic model types and the shape of the parsed nodes.
+خطای اعتبارسنجی زیر را نشان می‌دهد `A property 'age' is not expected` زیرا اعلان `MyType` شامل ویژگی `age` نمی‌شود. به طور خلاصه، *انواع اعلام شده* یک لایه حفاظتی از طریق اعتبارسنجی به دستور زبان اضافه می کند که از عدم تطابق بین انواع مدل معنایی مورد انتظار و شکل گره های تجزیه شده جلوگیری می کند.
 
-A declared type can also extend types, such as other declared types or types inferred from parser rules:
+
+یک نوع اعلام شده همچنین می تواند انواع را گسترش دهد، مانند انواع دیگر اعلام شده یا انواع استنتاج شده از قوانین تجزیه کننده:
 
 ```langium
 interface MyType {
@@ -303,8 +299,7 @@ interface MyOtherType extends MyType {
 Y returns MyOtherType: name=ID count=INT;
 ```
 
-Explicitly declaring union types in the grammar is achieved with the keyword `type`:
-
+اعلان صریح انواع اتحاد در گرامر با کلمه کلیدی `type` به دست می آید:
 ```ts
 type X = A | B;
 
@@ -319,11 +314,12 @@ type X = A | B;
 Y returns X: name=ID;
 ``` -->
 
-Using `returns` always expects a reference to an already existing type. To create a new type for your rule, use the `infers` keyword or explicitly declare an interface.
+استفاده از `return` همیشه انتظار ارجاع به نوع موجود را دارد. برای ایجاد یک نوع جدید برای قانون خود، از کلمه کلیدی`infers` استفاده کنید یا به صراحت یک رابط را اعلام کنید.
+### ارجاعات متقابل، آرایه ها و جایگزین ها
 
-### Cross-references, Arrays, and Alternatives
 
-Declared types come with special syntax to declare cross-references, arrays, and alternatives:
+انواع اعلان شده دارای دستور خاصی برای اعلام ارجاعات متقابل، آرایه ها و جایگزین ها هستند:
+
 
 ```langium
 interface A {
@@ -348,9 +344,10 @@ Y returns B: 'Y' name=ID;
 Z returns C: 'Z' name=ID count=INT;
 ```
 
-### Actions
+### اقدامات(Actions)
 
-Actions referring to a declared type have the following syntax:
+
+اقدامات مربوط به یک نوع اعلام شده دارای دستور زیر هستند:
 
 ```langium
 interface A {
@@ -367,26 +364,26 @@ X:
   | {B} 'B' name=ID count=INT;
 ```
 
-Note the absence of the keyword `infer` compared to [actions which infer a type](#simple-actions).
+به عدم وجود کلمه کلیدی `infer` در مقایسه با [actions which infer a type](#simple-actions) توجه داشته باشید.
 
-## Reference Unions
+## اتحادهای مرجع
 
-Trying to reference different types of elements can be an error prone process. Take a look at the following rule which tries to reference either a `Function` or a `Variable`:
+
+تلاش برای ارجاع به انواع مختلف عناصر می تواند فرآیندی مستعد خطا باشد. به قانون زیر نگاهی بیندازید که سعی می‌کند به یک `Function` یا `Variable` ارجاع دهد:
+
 
 ```langium
 MemberCall: (element=[Function:ID] | element=[Variable:ID]);
 ```
 
-As both alternatives are only an `ID` from a parser perspective, this grammar is not decidable and the `langium` CLI script will throw an error during generation. Luckily, we can improve on this by adding a layer of indirection using an additional parser rule:
-
+از آنجایی که هر دو گزینه از نظر تجزیه‌کننده فقط یک `ID` هستند، این دستور زبان قابل تصمیم‌گیری نیست و سند `CLI `langium در طول تولید با خطا مواجه می‌شود. خوشبختانه، ما می‌توانیم با افزودن یک لایه غیرمستقیم با استفاده از یک قانون تجزیه‌کننده اضافی، این مورد را بهبود بخشیم:
 ```langium
 NamedElement: Function | Variable;
 
 MemberCall: element=[NamedElement:ID];
 ```
 
-This allows us to reference either `Function` or `Variable` using the common rule `NamedElement`. However, we have now introduced a rule which is never actually parsed, but only exists for the purpose of the type system to pick up on the correct target types of the reference. Using declared types, we are able to refactor this unused rule, making our grammar more resilient in the process:
-
+این به ما این امکان را می‌دهد با استفاده از قانون رایج `NamedElement` به `Function` یا `Variable` ارجاع دهیم. هرچند، اکنون قانونی را معرفی کرده‌ایم که هرگز تجزیه نمی‌شود، بلکه فقط برای هدف سیستم نوع وجود دارد تا انواع هدف صحیح مرجع را انتخاب کند. با استفاده از انواع اعلام شده، می‌توانیم این قانون استفاده‌ نشده را اصلاح کنیم و گرامر خود را در این فرآیند انعطاف‌ پذیرتر کنیم:
 ```langium
 // Note the `type` prefix here
 type NamedElement = Function | Variable;
@@ -394,7 +391,8 @@ type NamedElement = Function | Variable;
 MemberCall: element=[NamedElement:ID];
 ```
 
-We can also use interfaces in place of union types with similar results:
+همچنین می‌توانیم از رابط‌ها به جای انواع اتحاد با نتایج مشابه استفاده کنیم:
+
 
 ```langium
 interface NamedElement {
